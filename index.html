@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✿ Convertitore SI → Imperiale ✿</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500&display=swap');
+
+  :root {
+    --blush:       #f4c2c2;
+    --petal:       #f9dde0;
+    --rose:        #e8a0a8;
+    --deep-rose:   #c97a88;
+    --mauve:       #b56576;
+    --cream:       #fff8f8;
+    --soft-white:  #fef0f2;
+    --text-dark:   #5a2d3a;
+    --text-mid:    #8a4f5e;
+    --text-light:  #b87f8e;
+    --bow:         #f0a8b8;
+    --shadow:      rgba(197,100,120,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    color: var(--text-dark);
+    overflow-x: hidden;
+  }
+
+  /* ── Background pattern ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 0%,  #fce4ec88 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 100%, #f8bbd088 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 50% 50%,  #fce4ec44 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      radial-gradient(circle 1px at 20% 30%, #e8a0a840 1px, transparent 0),
+      radial-gradient(circle 1px at 60% 70%, #f4c2c240 1px, transparent 0),
+      radial-gradient(circle 1px at 80% 20%, #e8a0a830 1px, transparent 0),
+      radial-gradient(circle 1px at 40% 80%, #f4c2c230 1px, transparent 0);
+    background-size: 120px 120px, 80px 80px, 100px 100px, 90px 90px;
+    pointer-events: none;
+  }
+
+  /* ── Header ── */
+  header {
+    position: relative; z-index: 2;
+    text-align: center;
+    padding: 3.5rem 1rem 1.5rem;
+  }
+
+  .header-ribbon {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--blush), var(--rose));
+    border-radius: 50px;
+    padding: 0.4rem 2.5rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mauve);
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 300;
+    color: var(--text-dark);
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--mauve);
+  }
+
+  .subtitle {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    letter-spacing: 0.12em;
+    font-weight: 300;
+  }
+
+  /* ── Bows decoration ── */
+  .bow {
+    display: inline-block;
+    font-size: 1.4rem;
+    animation: sway 3s ease-in-out infinite;
+  }
+  .bow:nth-child(2) { animation-delay: 0.5s; }
+  @keyframes sway {
+    0%,100% { transform: rotate(-5deg); }
+    50%      { transform: rotate(5deg); }
+  }
+
+  /* ── Tab bar ── */
+  .tabs-wrapper {
+    position: relative; z-index: 2;
+    overflow-x: auto;
+    padding: 0 1rem;
+    scrollbar-width: none;
+  }
+  .tabs-wrapper::-webkit-scrollbar { display: none; }
+
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    min-width: max-content;
+    margin: 0 auto;
+    padding: 0 1rem 0.5rem;
+  }
+
+  .tab-btn {
+    border: none;
+    background: var(--soft-white);
+    color: var(--text-light);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    padding: 0.55rem 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.25s;
+    border: 1.5px solid transparent;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover {
+    background: var(--petal);
+    color: var(--deep-rose);
+    border-color: var(--blush);
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--rose), var(--deep-rose));
+    color: #fff;
+    box-shadow: 0 4px 16px var(--shadow);
+    border-color: transparent;
+  }
+
+  /* ── Main container ── */
+  main {
+    position: relative; z-index: 2;
+    max-width: 860px;
+    margin: 1.5rem auto 4rem;
+    padding: 0 1rem;
+  }
+
+  /* ── Category panel ── */
+  .category-panel { display: none; animation: fadeIn 0.35s ease; }
+  .category-panel.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+
+  .panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--deep-rose);
+    text-align: center;
+    margin-bottom: 1.8rem;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Conversion cards ── */
+  .card {
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(8px);
+    border: 1.5px solid var(--blush);
+    border-radius: 20px;
+    padding: 1.6rem 1.8rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 4px 24px var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(197,100,120,0.2);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .card-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--petal), var(--blush));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    border: 1.5px solid var(--rose);
+  }
+
+  .card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--text-dark);
+  }
+
+  .card-direction {
+    font-size: 0.68rem;
+    color: var(--text-light);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-left: auto;
+    background: var(--petal);
+    padding: 0.2rem 0.7rem;
+    border-radius: 50px;
+  }
+
+  /* ── Input row ── */
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 0.3rem; }
+
+  .field-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  .field-input {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.45rem;
+    font-weight: 400;
+    color: var(--text-dark);
+    background: var(--soft-white);
+    border: 1.5px solid var(--blush);
+    border-radius: 12px;
+    padding: 0.5rem 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .field-input:focus {
+    border-color: var(--rose);
+    box-shadow: 0 0 0 3px rgba(232,160,168,0.25);
+  }
+
+  .field-unit {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── Arrow ── */
+  .arrow-btn {
+    background: linear-gradient(135deg, var(--blush), var(--rose));
+    border: none;
+    border-radius: 50%;
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.2s;
+    box-shadow: 0 2px 10px var(--shadow);
+    flex-shrink: 0;
+  }
+  .arrow-btn:hover {
+    background: linear-gradient(135deg, var(--rose), var(--mauve));
+    transform: scale(1.1);
+  }
+
+  /* ── Formula box ── */
+  .formula-box {
+    background: linear-gradient(135deg, #fff0f4, #fde8ee);
+    border: 1px dashed var(--rose);
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    font-size: 0.8rem;
+    color: var(--text-mid);
+    line-height: 1.5;
+  }
+
+  .formula-label {
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-light);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .formula-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.92rem;
+    color: var(--mauve);
+    font-style: italic;
+  }
+
+  /* ── Result highlight ── */
+  .field-input.result {
+    background: linear-gradient(135deg, #fff0f4, #fce8ed);
+    color: var(--mauve);
+    font-weight: 500;
+    border-color: var(--rose);
+  }
+
+  /* ── Footer ── */
+  footer {
+    position: relative; z-index: 2;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.72rem;
+    color: var(--text-light);
+    letter-spacing: 0.1em;
+  }
+
+  footer span { color: var(--deep-rose); }
+
+  /* ── Floating petals ── */
+  .petal-float {
+    position: fixed;
+    font-size: 1.2rem;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+    animation: floatPetal linear infinite;
+  }
+  @keyframes floatPetal {
+    0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.35; }
+    90%  { opacity: 0.35; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 520px) {
+    .input-row { grid-template-columns: 1fr auto 1fr; gap: 0.5rem; }
+    .field-input { font-size: 1.15rem; padding: 0.45rem 0.6rem; }
+    .card { padding: 1.2rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating petals -->
+<div class="petal-float" style="left:5%;  animation-duration:12s; animation-delay:0s;">🌸</div>
+<div class="petal-float" style="left:20%; animation-duration:15s; animation-delay:3s;">✿</div>
+<div class="petal-float" style="left:40%; animation-duration:10s; animation-delay:7s;">🌷</div>
+<div class="petal-float" style="left:65%; animation-duration:14s; animation-delay:2s;">🌸</div>
+<div class="petal-float" style="left:82%; animation-duration:11s; animation-delay:5s;">✿</div>
+
+<header>
+  <div class="header-ribbon">✦ Sistema Internazionale → Imperiale ✦</div>
+  <h1><span class="bow">🎀</span> <em>Convertitore</em> di Unità <span class="bow">🎀</span></h1>
+  <p class="subtitle">◦ lunghezza · massa · forza · pressione · velocità · temperatura · potenza · area ◦</p>
+</header>
+
+<div class="tabs-wrapper">
+  <div class="tabs" id="tabBar"></div>
+</div>
+
+<main id="mainContent"></main>
+
+<footer>✿ Tutti i calcoli avvengono localmente nel browser &nbsp;·&nbsp; <span>nessun server necessario</span> ✿</footer>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const categories = [
+  {
+    id: 'lunghezza',
+    label: 'Lunghezza',
+    icon: '📏',
+    conversions: [
+      { name: 'Chilometri → Miglia', icon: '🗺️',
+        unitFrom: 'km', unitTo: 'mi',
+        toImperial: v => v * 0.621371,
+        toSI: v => v / 0.621371,
+        formula: '1 km = 0.621371 mi  →  mi = km × 0.621371',
+        formulaRev: 'km = mi ÷ 0.621371' },
+      { name: 'Metri → Piedi', icon: '📐',
+        unitFrom: 'm', unitTo: 'ft',
+        toImperial: v => v * 3.28084,
+        toSI: v => v / 3.28084,
+        formula: '1 m = 3.28084 ft  →  ft = m × 3.28084',
+        formulaRev: 'm = ft ÷ 3.28084' },
+      { name: 'Centimetri → Pollici', icon: '✏️',
+        unitFrom: 'cm', unitTo: 'in',
+        toImperial: v => v / 2.54,
+        toSI: v => v * 2.54,
+        formula: '1 in = 2.54 cm  →  in = cm ÷ 2.54',
+        formulaRev: 'cm = in × 2.54' },
+      { name: 'Metri → Iarde', icon: '🏟️',
+        unitFrom: 'm', unitTo: 'yd',
+        toImperial: v => v * 1.09361,
+        toSI: v => v / 1.09361,
+        formula: '1 m = 1.09361 yd  →  yd = m × 1.09361',
+        formulaRev: 'm = yd ÷ 1.09361' },
+    ]
+  },
+  {
+    id: 'massa',
+    label: 'Massa',
+    icon: '⚖️',
+    conversions: [
+      { name: 'Chilogrammi → Libbre', icon: '🏋️',
+        unitFrom: 'kg', unitTo: 'lb',
+        toImperial: v => v * 2.20462,
+        toSI: v => v / 2.20462,
+        formula: '1 kg = 2.20462 lb  →  lb = kg × 2.20462',
+        formulaRev: 'kg = lb ÷ 2.20462' },
+      { name: 'Grammi → Once', icon: '🍃',
+        unitFrom: 'g', unitTo: 'oz',
+        toImperial: v => v / 28.3495,
+        toSI: v => v * 28.3495,
+        formula: '1 oz = 28.3495 g  →  oz = g ÷ 28.3495',
+        formulaRev: 'g = oz × 28.3495' },
+      { name: 'Tonnellate → Ton corte', icon: '🚢',
+        unitFrom: 't', unitTo: 'ton',
+        toImperial: v => v * 1.10231,
+        toSI: v => v / 1.10231,
+        formula: '1 t = 1.10231 short ton  →  ton = t × 1.10231',
+        formulaRev: 't = ton ÷ 1.10231' },
+    ]
+  },
+  {
+    id: 'forza',
+    label: 'Forza',
+    icon: '💪',
+    conversions: [
+      { name: 'Newton → Libbra-forza', icon: '🔩',
+        unitFrom: 'N', unitTo: 'lbf',
+        toImperial: v => v * 0.224809,
+        toSI: v => v / 0.224809,
+        formula: '1 N = 0.224809 lbf  →  lbf = N × 0.224809',
+        formulaRev: 'N = lbf ÷ 0.224809' },
+      { name: 'Kilonewton → Libbra-forza', icon: '⚙️',
+        unitFrom: 'kN', unitTo: 'lbf',
+        toImperial: v => v * 224.809,
+        toSI: v => v / 224.809,
+        formula: '1 kN = 224.809 lbf  →  lbf = kN × 224.809',
+        formulaRev: 'kN = lbf ÷ 224.809' },
+      { name: 'Newton → Oncia-forza', icon: '🔧',
+        unitFrom: 'N', unitTo: 'ozf',
+        toImperial: v => v * 3.59694,
+        toSI: v => v / 3.59694,
+        formula: '1 N = 3.59694 ozf  →  ozf = N × 3.59694',
+        formulaRev: 'N = ozf ÷ 3.59694' },
+    ]
+  },
+  {
+    id: 'pressione',
+    label: 'Pressione',
+    icon: '🌡️',
+    conversions: [
+      { name: 'Pascal → PSI', icon: '🔴',
+        unitFrom: 'Pa', unitTo: 'psi',
+        toImperial: v => v / 6894.757,
+        toSI: v => v * 6894.757,
+        formula: '1 psi = 6894.757 Pa  →  psi = Pa ÷ 6894.757',
+        formulaRev: 'Pa = psi × 6894.757' },
+      { name: 'Bar → PSI', icon: '🔵',
+        unitFrom: 'bar', unitTo: 'psi',
+        toImperial: v => v * 14.5038,
+        toSI: v => v / 14.5038,
+        formula: '1 bar = 14.5038 psi  →  psi = bar × 14.5038',
+        formulaRev: 'bar = psi ÷ 14.5038' },
+      { name: 'Atmosfere → Pollici Hg', icon: '💈',
+        unitFrom: 'atm', unitTo: 'inHg',
+        toImperial: v => v * 29.9213,
+        toSI: v => v / 29.9213,
+        formula: '1 atm = 29.9213 inHg  →  inHg = atm × 29.9213',
+        formulaRev: 'atm = inHg ÷ 29.9213' },
+      { name: 'Kilopascal → PSI', icon: '🔮',
+        unitFrom: 'kPa', unitTo: 'psi',
+        toImperial: v => v * 0.145038,
+        toSI: v => v / 0.145038,
+        formula: '1 kPa = 0.145038 psi  →  psi = kPa × 0.145038',
+        formulaRev: 'kPa = psi ÷ 0.145038' },
+    ]
+  },
+  {
+    id: 'velocita',
+    label: 'Velocità',
+    icon: '🚀',
+    conversions: [
+      { name: 'km/h → mph', icon: '🚗',
+        unitFrom: 'km/h', unitTo: 'mph',
+        toImperial: v => v * 0.621371,
+        toSI: v => v / 0.621371,
+        formula: '1 km/h = 0.621371 mph  →  mph = km/h × 0.621371',
+        formulaRev: 'km/h = mph ÷ 0.621371' },
+      { name: 'm/s → mph', icon: '💨',
+        unitFrom: 'm/s', unitTo: 'mph',
+        toImperial: v => v * 2.23694,
+        toSI: v => v / 2.23694,
+        formula: '1 m/s = 2.23694 mph  →  mph = m/s × 2.23694',
+        formulaRev: 'm/s = mph ÷ 2.23694' },
+      { name: 'Nodi → mph', icon: '⛵',
+        unitFrom: 'kn', unitTo: 'mph',
+        toImperial: v => v * 1.15078,
+        toSI: v => v / 1.15078,
+        formula: '1 kn = 1.15078 mph  →  mph = kn × 1.15078',
+        formulaRev: 'kn = mph ÷ 1.15078' },
+      { name: 'm/s → ft/s', icon: '🏃',
+        unitFrom: 'm/s', unitTo: 'ft/s',
+        toImperial: v => v * 3.28084,
+        toSI: v => v / 3.28084,
+        formula: '1 m/s = 3.28084 ft/s  →  ft/s = m/s × 3.28084',
+        formulaRev: 'm/s = ft/s ÷ 3.28084' },
+    ]
+  },
+  {
+    id: 'temperatura',
+    label: 'Temperatura',
+    icon: '🌸',
+    conversions: [
+      { name: 'Celsius → Fahrenheit', icon: '🌡️',
+        unitFrom: '°C', unitTo: '°F',
+        toImperial: v => v * 9/5 + 32,
+        toSI: v => (v - 32) * 5/9,
+        formula: '°F = (°C × 9/5) + 32',
+        formulaRev: '°C = (°F − 32) × 5/9' },
+      { name: 'Kelvin → Fahrenheit', icon: '❄️',
+        unitFrom: 'K', unitTo: '°F',
+        toImperial: v => (v - 273.15) * 9/5 + 32,
+        toSI: v => (v - 32) * 5/9 + 273.15,
+        formula: '°F = (K − 273.15) × 9/5 + 32',
+        formulaRev: 'K = (°F − 32) × 5/9 + 273.15' },
+      { name: 'Kelvin → Rankine', icon: '🔥',
+        unitFrom: 'K', unitTo: '°R',
+        toImperial: v => v * 1.8,
+        toSI: v => v / 1.8,
+        formula: '°R = K × 1.8',
+        formulaRev: 'K = °R ÷ 1.8' },
+    ]
+  },
+  {
+    id: 'potenza',
+    label: 'Potenza',
+    icon: '⚡',
+    conversions: [
+      { name: 'Watt → Cavalli vapore', icon: '🐎',
+        unitFrom: 'W', unitTo: 'hp',
+        toImperial: v => v / 745.7,
+        toSI: v => v * 745.7,
+        formula: '1 hp = 745.7 W  →  hp = W ÷ 745.7',
+        formulaRev: 'W = hp × 745.7' },
+      { name: 'Kilowatt → Cavalli vapore', icon: '🏎️',
+        unitFrom: 'kW', unitTo: 'hp',
+        toImperial: v => v * 1.34102,
+        toSI: v => v / 1.34102,
+        formula: '1 kW = 1.34102 hp  →  hp = kW × 1.34102',
+        formulaRev: 'kW = hp ÷ 1.34102' },
+      { name: 'Watt → BTU/ora', icon: '🔆',
+        unitFrom: 'W', unitTo: 'BTU/h',
+        toImperial: v => v * 3.41214,
+        toSI: v => v / 3.41214,
+        formula: '1 W = 3.41214 BTU/h  →  BTU/h = W × 3.41214',
+        formulaRev: 'W = BTU/h ÷ 3.41214' },
+      { name: 'kW → BTU/ora', icon: '💡',
+        unitFrom: 'kW', unitTo: 'BTU/h',
+        toImperial: v => v * 3412.14,
+        toSI: v => v / 3412.14,
+        formula: '1 kW = 3412.14 BTU/h  →  BTU/h = kW × 3412.14',
+        formulaRev: 'kW = BTU/h ÷ 3412.14' },
+    ]
+  },
+  {
+    id: 'area',
+    label: 'Area',
+    icon: '🟪',
+    conversions: [
+      { name: 'm² → ft²', icon: '🏠',
+        unitFrom: 'm²', unitTo: 'ft²',
+        toImperial: v => v * 10.7639,
+        toSI: v => v / 10.7639,
+        formula: '1 m² = 10.7639 ft²  →  ft² = m² × 10.7639',
+        formulaRev: 'm² = ft² ÷ 10.7639' },
+      { name: 'km² → Miglia²', icon: '🗾',
+        unitFrom: 'km²', unitTo: 'mi²',
+        toImperial: v => v * 0.386102,
+        toSI: v => v / 0.386102,
+        formula: '1 km² = 0.386102 mi²  →  mi² = km² × 0.386102',
+        formulaRev: 'km² = mi² ÷ 0.386102' },
+      { name: 'Ettari → Acri', icon: '🌾',
+        unitFrom: 'ha', unitTo: 'ac',
+        toImperial: v => v * 2.47105,
+        toSI: v => v / 2.47105,
+        formula: '1 ha = 2.47105 ac  →  ac = ha × 2.47105',
+        formulaRev: 'ha = ac ÷ 2.47105' },
+      { name: 'cm² → in²', icon: '📦',
+        unitFrom: 'cm²', unitTo: 'in²',
+        toImperial: v => v / 6.4516,
+        toSI: v => v * 6.4516,
+        formula: '1 in² = 6.4516 cm²  →  in² = cm² ÷ 6.4516',
+        formulaRev: 'cm² = in² × 6.4516' },
+    ]
+  },
+];
+
+// ─────────────────────────────────────────────
+// STATE: track direction per conversion
+// ─────────────────────────────────────────────
+const directions = {}; // key: `${catId}-${convIdx}` → 'forward' | 'reverse'
+
+// ─────────────────────────────────────────────
+// BUILD UI
+// ─────────────────────────────────────────────
+const tabBar = document.getElementById('tabBar');
+const mainContent = document.getElementById('mainContent');
+
+categories.forEach((cat, ci) => {
+  // Tab button
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (ci === 0 ? ' active' : '');
+  btn.textContent = cat.icon + ' ' + cat.label;
+  btn.addEventListener('click', () => switchTab(cat.id));
+  tabBar.appendChild(btn);
+
+  // Panel
+  const panel = document.createElement('div');
+  panel.id = 'panel-' + cat.id;
+  panel.className = 'category-panel' + (ci === 0 ? ' active' : '');
+
+  const title = document.createElement('div');
+  title.className = 'panel-title';
+  title.textContent = cat.icon + '  ' + cat.label;
+  panel.appendChild(title);
+
+  cat.conversions.forEach((conv, vi) => {
+    const key = `${cat.id}-${vi}`;
+    directions[key] = 'forward';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-icon">${conv.icon}</div>
+        <div class="card-name">${conv.name}</div>
+        <div class="card-direction" id="dir-${key}">SI → Imperiale</div>
+      </div>
+      <div class="input-row">
+        <div class="field-group">
+          <div class="field-label" id="lbl-from-${key}">${conv.unitFrom}</div>
+          <input class="field-input" type="number" id="inp-from-${key}" placeholder="0" step="any" />
+          <div class="field-unit" id="unit-from-${key}">${conv.unitFrom}</div>
+        </div>
+        <button class="arrow-btn" id="arrow-${key}" title="Inverti direzione">⇄</button>
+        <div class="field-group">
+          <div class="field-label" id="lbl-to-${key}">${conv.unitTo}</div>
+          <input class="field-input result" type="number" id="inp-to-${key}" placeholder="—" readonly />
+          <div class="field-unit" id="unit-to-${key}">${conv.unitTo}</div>
+        </div>
+      </div>
+      <div class="formula-box">
+        <div class="formula-label">✦ formula</div>
+        <div class="formula-text" id="formula-${key}">${conv.formula}</div>
+      </div>
+    `;
+
+    panel.appendChild(card);
+
+    // Events (after appending so elements exist)
+    setTimeout(() => {
+      const inpFrom  = document.getElementById(`inp-from-${key}`);
+      const inpTo    = document.getElementById(`inp-to-${key}`);
+      const arrowBtn = document.getElementById(`arrow-${key}`);
+
+      inpFrom.addEventListener('input', () => {
+        const val = parseFloat(inpFrom.value);
+        if (isNaN(val)) { inpTo.value = ''; return; }
+        const result = directions[key] === 'forward'
+          ? conv.toImperial(val)
+          : conv.toSI(val);
+        inpTo.value = +result.toFixed(6);
+      });
+
+      arrowBtn.addEventListener('click', () => {
+        directions[key] = directions[key] === 'forward' ? 'reverse' : 'forward';
+        const fwd = directions[key] === 'forward';
+
+        document.getElementById(`lbl-from-${key}`).textContent  = fwd ? conv.unitFrom : conv.unitTo;
+        document.getElementById(`unit-from-${key}`).textContent = fwd ? conv.unitFrom : conv.unitTo;
+        document.getElementById(`lbl-to-${key}`).textContent    = fwd ? conv.unitTo   : conv.unitFrom;
+        document.getElementById(`unit-to-${key}`).textContent   = fwd ? conv.unitTo   : conv.unitFrom;
+        document.getElementById(`dir-${key}`).textContent       = fwd ? 'SI → Imperiale' : 'Imperiale → SI';
+        document.getElementById(`formula-${key}`).textContent   = fwd ? conv.formula : conv.formulaRev;
+
+        // Flip values
+        const old = parseFloat(inpTo.value);
+        inpFrom.value = isNaN(old) ? '' : old;
+        if (!isNaN(old)) {
+          const res = fwd ? conv.toImperial(old) : conv.toSI(old);
+          inpTo.value = +res.toFixed(6);
+        } else {
+          inpTo.value = '';
+        }
+
+        // Animate arrow
+        arrowBtn.style.transform = 'scale(1.25) rotate(180deg)';
+        setTimeout(() => { arrowBtn.style.transform = ''; }, 200);
+      });
+    }, 0);
+  });
+
+  mainContent.appendChild(panel);
+});
+
+// ─────────────────────────────────────────────
+// TAB SWITCHING
+// ─────────────────────────────────────────────
+function switchTab(catId) {
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', categories[i].id === catId);
+  });
+  document.querySelectorAll('.category-panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-' + catId);
+  });
+}
+</script>
+</body>
+</html>
