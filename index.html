@@ -3,748 +3,618 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✿ Convertitore SI → Imperiale ✿</title>
+<title>Convertitore SI → Imperiale · G. Evangelista</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Nunito:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;500;600;700&family=Barlow:wght@300;400;500&display=swap');
 
   :root {
-    --blush:       #f4c2c2;
-    --petal:       #f9dde0;
-    --rose:        #e8a0a8;
-    --deep-rose:   #c97a88;
-    --mauve:       #b56576;
-    --cream:       #fff8f8;
-    --soft-white:  #fef0f2;
-    --text-dark:   #5a2d3a;
-    --text-mid:    #8a4f5e;
-    --text-light:  #b87f8e;
-    --bow:         #f0a8b8;
-    --shadow:      rgba(197,100,120,0.15);
+    --bg:        #080808;
+    --bg2:       #0f0f0f;
+    --bg3:       #161616;
+    --panel:     #111111;
+    --border:    #242424;
+    --border-hi: #383838;
+    --accent:    #cccccc;
+    --white:     #f0f0f0;
+    --dim:       #484848;
+    --dim2:      #2e2e2e;
+    --text:      #e0e0e0;
+    --text-mid:  #888888;
+    --text-dim:  #4a4a4a;
+    --amber:     #c4a03a;
+    --amber-lo:  #6a5520;
+    --green:     #5a9e5a;
+    --green-lo:  #1e3a1e;
+    --shadow:    rgba(0,0,0,0.8);
+    --grid:      rgba(255,255,255,0.025);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--cream);
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
     min-height: 100vh;
-    color: var(--text-dark);
+    color: var(--text);
     overflow-x: hidden;
   }
 
-  /* ── Background pattern ── */
+  /* grid bg */
   body::before {
     content: '';
     position: fixed; inset: 0; z-index: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 10% 0%,  #fce4ec88 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 90% 100%, #f8bbd088 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 50% 50%,  #fce4ec44 0%, transparent 70%);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 44px 44px;
     pointer-events: none;
   }
 
+  /* vignette */
   body::after {
     content: '';
     position: fixed; inset: 0; z-index: 0;
-    background-image:
-      radial-gradient(circle 1px at 20% 30%, #e8a0a840 1px, transparent 0),
-      radial-gradient(circle 1px at 60% 70%, #f4c2c240 1px, transparent 0),
-      radial-gradient(circle 1px at 80% 20%, #e8a0a830 1px, transparent 0),
-      radial-gradient(circle 1px at 40% 80%, #f4c2c230 1px, transparent 0);
-    background-size: 120px 120px, 80px 80px, 100px 100px, 90px 90px;
+    background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 45%, rgba(0,0,0,0.65) 100%);
     pointer-events: none;
   }
 
-  /* ── Header ── */
+  /* ══ INSTRUMENT BAR ══════════════════════════ */
+  .instrument-bar {
+    position: relative; z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 42px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-mid);
+    letter-spacing: 0.1em;
+    gap: 1rem;
+  }
+
+  .ibar-l { display: flex; align-items: center; gap: 1.4rem; flex-wrap: nowrap; }
+  .ibar-r { flex-shrink: 0; }
+
+  .ib-item { display: flex; align-items: center; gap: 0.45em; }
+  .ib-k { color: var(--text-dim); font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; }
+  .ib-v { color: var(--accent); }
+
+  .sep { color: var(--dim2); user-select: none; }
+
+  .status-led {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4caf50;
+    box-shadow: 0 0 7px #4caf50;
+    animation: blink 2.4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .clock {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    color: var(--amber);
+    background: rgba(196,160,58,0.07);
+    border: 1px solid var(--amber-lo);
+    padding: 0.18rem 0.8rem;
+    border-radius: 3px;
+  }
+
+  /* ══ HEADER ══════════════════════════════════ */
   header {
     position: relative; z-index: 2;
     text-align: center;
-    padding: 3.5rem 1rem 1.5rem;
+    padding: 2.8rem 1rem 2rem;
+    border-bottom: 1px solid var(--border);
   }
 
-  .header-ribbon {
+  .hdr-eyebrow {
     display: inline-block;
-    background: linear-gradient(135deg, var(--blush), var(--rose));
-    border-radius: 50px;
-    padding: 0.4rem 2.5rem;
-    font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: 0.25em;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.38em;
     text-transform: uppercase;
-    color: var(--mauve);
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 12px var(--shadow);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 0.25rem 1.4rem;
+    border-radius: 2px;
+    margin-bottom: 1.1rem;
+    background: var(--bg3);
   }
 
   h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2.2rem, 5vw, 3.8rem);
-    font-weight: 300;
-    color: var(--text-dark);
-    line-height: 1.1;
-    letter-spacing: 0.02em;
-  }
-
-  h1 em {
-    font-style: italic;
-    color: var(--mauve);
-  }
-
-  .subtitle {
-    margin-top: 0.6rem;
-    font-size: 0.85rem;
-    color: var(--text-light);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 200;
+    font-size: clamp(2.2rem, 6vw, 4rem);
     letter-spacing: 0.12em;
-    font-weight: 300;
+    text-transform: uppercase;
+    color: var(--white);
+    line-height: 1;
   }
 
-  /* ── Bows decoration ── */
-  .bow {
-    display: inline-block;
-    font-size: 1.4rem;
-    animation: sway 3s ease-in-out infinite;
-  }
-  .bow:nth-child(2) { animation-delay: 0.5s; }
-  @keyframes sway {
-    0%,100% { transform: rotate(-5deg); }
-    50%      { transform: rotate(5deg); }
+  h1 b { font-weight: 700; }
+  h1 .div { color: var(--dim); font-weight: 200; margin: 0 0.2em; }
+
+  .hdr-meta {
+    margin-top: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.8rem;
+    flex-wrap: wrap;
   }
 
-  /* ── Tab bar ── */
-  .tabs-wrapper {
+  .meta-pill {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+  .meta-pill b { color: var(--text-mid); font-weight: normal; }
+
+  .author-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    border: 1px solid var(--amber-lo);
+    background: rgba(196,160,58,0.05);
+    padding: 0.22rem 1rem;
+    border-radius: 3px;
+  }
+
+  /* ══ TABS ════════════════════════════════════ */
+  .tabs-wrap {
     position: relative; z-index: 2;
     overflow-x: auto;
-    padding: 0 1rem;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
     scrollbar-width: none;
   }
-  .tabs-wrapper::-webkit-scrollbar { display: none; }
+  .tabs-wrap::-webkit-scrollbar { display: none; }
 
-  .tabs {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    min-width: max-content;
-    margin: 0 auto;
-    padding: 0 1rem 0.5rem;
-  }
+  .tabs { display: flex; min-width: max-content; }
 
   .tab-btn {
     border: none;
-    background: var(--soft-white);
-    color: var(--text-light);
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.78rem;
+    border-right: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
     font-weight: 500;
-    letter-spacing: 0.08em;
-    padding: 0.55rem 1.1rem;
-    border-radius: 50px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.7rem 1.3rem;
     cursor: pointer;
-    transition: all 0.25s;
-    border: 1.5px solid transparent;
+    transition: background 0.15s, color 0.15s;
     white-space: nowrap;
+    position: relative;
   }
-
-  .tab-btn:hover {
-    background: var(--petal);
-    color: var(--deep-rose);
-    border-color: var(--blush);
-  }
-
+  .tab-btn:hover { background: var(--bg3); color: var(--text-mid); }
   .tab-btn.active {
-    background: linear-gradient(135deg, var(--rose), var(--deep-rose));
-    color: #fff;
-    box-shadow: 0 4px 16px var(--shadow);
-    border-color: transparent;
+    background: var(--bg3);
+    color: var(--white);
   }
+  .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--white);
+  }
+  .tab-icon { margin-right: 0.35em; }
 
-  /* ── Main container ── */
+  /* ══ MAIN ════════════════════════════════════ */
   main {
     position: relative; z-index: 2;
-    max-width: 860px;
-    margin: 1.5rem auto 4rem;
-    padding: 0 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.2rem 5rem;
   }
 
-  /* ── Category panel ── */
-  .category-panel { display: none; animation: fadeIn 0.35s ease; }
+  .category-panel { display: none; animation: fadein 0.22s ease; }
   .category-panel.active { display: block; }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+  @keyframes fadein { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
 
-  .panel-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.8rem;
-    font-weight: 400;
-    font-style: italic;
-    color: var(--deep-rose);
-    text-align: center;
-    margin-bottom: 1.8rem;
-    letter-spacing: 0.03em;
+  /* panel header */
+  .ph {
+    display: flex; align-items: center; gap: 1rem;
+    padding-bottom: 1rem; margin-bottom: 1.6rem;
+    border-bottom: 1px solid var(--border);
   }
-
-  /* ── Conversion cards ── */
-  .card {
-    background: rgba(255,255,255,0.78);
-    backdrop-filter: blur(8px);
-    border: 1.5px solid var(--blush);
-    border-radius: 20px;
-    padding: 1.6rem 1.8rem;
-    margin-bottom: 1.2rem;
-    box-shadow: 0 4px 24px var(--shadow);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(197,100,120,0.2);
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    margin-bottom: 1.1rem;
-  }
-
-  .card-icon {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--petal), var(--blush));
+  .ph-icon {
+    width: 38px; height: 38px;
+    background: var(--bg3); border: 1px solid var(--border-hi);
+    border-radius: 4px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.1rem;
-    border: 1.5px solid var(--rose);
   }
-
-  .card-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.15rem;
-    font-weight: 500;
-    color: var(--text-dark);
+  .ph-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.3rem; font-weight: 600;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--white);
   }
-
-  .card-direction {
-    font-size: 0.68rem;
-    color: var(--text-light);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+  .ph-count {
     margin-left: auto;
-    background: var(--petal);
-    padding: 0.2rem 0.7rem;
-    border-radius: 50px;
-  }
-
-  /* ── Input row ── */
-  .input-row {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 0.8rem;
-    margin-bottom: 1rem;
-  }
-
-  .field-group { display: flex; flex-direction: column; gap: 0.3rem; }
-
-  .field-label {
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-light);
-    font-weight: 500;
-  }
-
-  .field-input {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.45rem;
-    font-weight: 400;
-    color: var(--text-dark);
-    background: var(--soft-white);
-    border: 1.5px solid var(--blush);
-    border-radius: 12px;
-    padding: 0.5rem 0.9rem;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    width: 100%;
-  }
-
-  .field-input:focus {
-    border-color: var(--rose);
-    box-shadow: 0 0 0 3px rgba(232,160,168,0.25);
-  }
-
-  .field-unit {
-    font-size: 0.72rem;
-    color: var(--text-light);
-    letter-spacing: 0.08em;
-  }
-
-  /* ── Arrow ── */
-  .arrow-btn {
-    background: linear-gradient(135deg, var(--blush), var(--rose));
-    border: none;
-    border-radius: 50%;
-    width: 38px; height: 38px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    color: white;
-    font-size: 1rem;
-    transition: all 0.2s;
-    box-shadow: 0 2px 10px var(--shadow);
-    flex-shrink: 0;
-  }
-  .arrow-btn:hover {
-    background: linear-gradient(135deg, var(--rose), var(--mauve));
-    transform: scale(1.1);
-  }
-
-  /* ── Formula box ── */
-  .formula-box {
-    background: linear-gradient(135deg, #fff0f4, #fde8ee);
-    border: 1px dashed var(--rose);
-    border-radius: 12px;
-    padding: 0.7rem 1rem;
-    font-size: 0.8rem;
-    color: var(--text-mid);
-    line-height: 1.5;
-  }
-
-  .formula-label {
-    font-size: 0.64rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--text-light);
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-  }
-
-  .formula-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.92rem;
-    color: var(--mauve);
-    font-style: italic;
-  }
-
-  /* ── Result highlight ── */
-  .field-input.result {
-    background: linear-gradient(135deg, #fff0f4, #fce8ed);
-    color: var(--mauve);
-    font-weight: 500;
-    border-color: var(--rose);
-  }
-
-  /* ── Footer ── */
-  footer {
-    position: relative; z-index: 2;
-    text-align: center;
-    padding: 1.5rem;
-    font-size: 0.72rem;
-    color: var(--text-light);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem; color: var(--text-dim);
     letter-spacing: 0.1em;
   }
 
-  footer span { color: var(--deep-rose); }
-
-  /* ── Floating petals ── */
-  .petal-float {
-    position: fixed;
-    font-size: 1.2rem;
-    opacity: 0.35;
-    pointer-events: none;
-    z-index: 0;
-    animation: floatPetal linear infinite;
+  /* ══ CARDS ═══════════════════════════════════ */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--dim2);
+    border-radius: 4px;
+    padding: 1.3rem 1.5rem;
+    margin-bottom: 2px;
+    transition: border-left-color 0.15s, background 0.15s;
+    position: relative;
   }
-  @keyframes floatPetal {
-    0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-    10%  { opacity: 0.35; }
-    90%  { opacity: 0.35; }
-    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  .card:hover {
+    background: #141414;
+    border-left-color: var(--accent);
   }
 
-  /* ── Responsive ── */
-  @media (max-width: 520px) {
-    .input-row { grid-template-columns: 1fr auto 1fr; gap: 0.5rem; }
-    .field-input { font-size: 1.15rem; padding: 0.45rem 0.6rem; }
-    .card { padding: 1.2rem 1rem; }
+  .card-hdr {
+    display: flex; align-items: center; gap: 0.7rem;
+    margin-bottom: 1rem;
+  }
+  .c-icon { color: var(--text-dim); font-size: 0.85rem; width: 20px; text-align: center; }
+  .c-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.98rem; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .c-dir {
+    margin-left: auto;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem; color: var(--text-dim);
+    letter-spacing: 0.12em;
+    background: var(--bg3); border: 1px solid var(--border);
+    padding: 0.12rem 0.5rem; border-radius: 2px;
+  }
+
+  /* input row */
+  .inp-row {
+    display: grid;
+    grid-template-columns: 1fr 38px 1fr;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.9rem;
+  }
+  .fld { display: flex; flex-direction: column; gap: 0.28rem; }
+  .fld-lbl {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+  .fld-inp {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.3rem;
+    color: var(--white);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.45rem 0.75rem;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+  .fld-inp::-webkit-outer-spin-button,
+  .fld-inp::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .fld-inp:focus { border-color: var(--accent); background: #0c0c0c; }
+
+  .fld-unit {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem; color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .fld-inp.result {
+    color: var(--green);
+    background: var(--green-lo);
+    border-color: #2d4a2d;
+  }
+
+  /* swap btn */
+  .swap-btn {
+    width: 38px; height: 38px;
+    background: var(--bg3);
+    border: 1px solid var(--border-hi);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text-mid);
+    font-size: 1rem;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+    align-self: center;
+  }
+  .swap-btn:hover {
+    background: var(--border-hi);
+    color: var(--white);
+    border-color: var(--accent);
+  }
+
+  /* formula */
+  .formula {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--dim);
+    padding: 0.55rem 0.85rem;
+    border-radius: 0 3px 3px 0;
+  }
+  .f-lbl {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.56rem; font-weight: 700;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 0.18rem;
+  }
+  .f-txt {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.76rem; color: var(--text-mid);
+  }
+
+  /* ══ FOOTER ══════════════════════════════════ */
+  footer {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 0.6rem;
+    padding: 0.75rem 2rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+  .ft-author { color: var(--amber); letter-spacing: 0.18em; }
+  .ft-status { display: flex; align-items: center; gap: 0.5rem; }
+
+  /* ══ RESPONSIVE ══════════════════════════════ */
+  @media (max-width: 540px) {
+    .instrument-bar { padding: 0 1rem; gap: 0.5rem; font-size: 0.6rem; }
+    .sep { display: none; }
+    .ibar-l .ib-item:nth-child(n+4) { display: none; }
+    .card { padding: 1rem 0.9rem; }
+    .fld-inp { font-size: 1.05rem; }
+    h1 { font-size: 1.9rem; }
   }
 </style>
 </head>
 <body>
 
-<!-- Floating petals -->
-<div class="petal-float" style="left:5%;  animation-duration:12s; animation-delay:0s;">🌸</div>
-<div class="petal-float" style="left:20%; animation-duration:15s; animation-delay:3s;">✿</div>
-<div class="petal-float" style="left:40%; animation-duration:10s; animation-delay:7s;">🌷</div>
-<div class="petal-float" style="left:65%; animation-duration:14s; animation-delay:2s;">🌸</div>
-<div class="petal-float" style="left:82%; animation-duration:11s; animation-delay:5s;">✿</div>
+<!-- ══ INSTRUMENT BAR ══ -->
+<div class="instrument-bar">
+  <div class="ibar-l">
+    <div class="ib-item">
+      <span class="ib-k">SYS</span>
+      <span class="ib-v">SI→IMP</span>
+    </div>
+    <span class="sep">│</span>
+    <div class="ib-item">
+      <span class="ib-k">OP</span>
+      <span class="ib-v">G.EVANGELISTA</span>
+    </div>
+    <span class="sep">│</span>
+    <div class="ib-item">
+      <span class="status-led"></span>
+      <span class="ib-v">ONLINE</span>
+    </div>
+    <span class="sep">│</span>
+    <div class="ib-item">
+      <span class="ib-k">CAT</span>
+      <span class="ib-v">8</span>
+    </div>
+    <span class="sep">│</span>
+    <div class="ib-item">
+      <span class="ib-k">CONV</span>
+      <span class="ib-v">28</span>
+    </div>
+  </div>
+  <div class="ibar-r">
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</div>
 
+<!-- ══ HEADER ══ -->
 <header>
-  <div class="header-ribbon">✦ Sistema Internazionale → Imperiale ✦</div>
-  <h1><span class="bow">🎀</span> <em>Convertitore</em> di Unità <span class="bow">🎀</span></h1>
-  <p class="subtitle">◦ lunghezza · massa · forza · pressione · velocità · temperatura · potenza · area ◦</p>
+  <div class="hdr-eyebrow">◈ Strumento di Conversione Unità di Misura ◈</div>
+  <h1>SI <span class="div">/</span> <b>Imperial</b></h1>
+  <div class="hdr-meta">
+    <div class="meta-pill">VER <b>2.0</b></div>
+    <div class="author-badge">Giacomo Evangelista</div>
+    <div class="meta-pill">28 CONVERSIONI</div>
+  </div>
 </header>
 
-<div class="tabs-wrapper">
+<!-- ══ TABS ══ -->
+<div class="tabs-wrap">
   <div class="tabs" id="tabBar"></div>
 </div>
 
+<!-- ══ CONTENT ══ -->
 <main id="mainContent"></main>
 
-<footer>✿ Tutti i calcoli avvengono localmente nel browser &nbsp;·&nbsp; <span>nessun server necessario</span> ✿</footer>
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="ft-author">▸ GIACOMO EVANGELISTA</div>
+  <div>CALCOLI LOCALI · NESSUN SERVER RICHIESTO</div>
+  <div class="ft-status"><span class="status-led"></span>SISTEMA ATTIVO</div>
+</footer>
 
 <script>
-// ─────────────────────────────────────────────
-// DATA
-// ─────────────────────────────────────────────
-const categories = [
-  {
-    id: 'lunghezza',
-    label: 'Lunghezza',
-    icon: '📏',
-    conversions: [
-      { name: 'Chilometri → Miglia', icon: '🗺️',
-        unitFrom: 'km', unitTo: 'mi',
-        toImperial: v => v * 0.621371,
-        toSI: v => v / 0.621371,
-        formula: '1 km = 0.621371 mi  →  mi = km × 0.621371',
-        formulaRev: 'km = mi ÷ 0.621371' },
-      { name: 'Metri → Piedi', icon: '📐',
-        unitFrom: 'm', unitTo: 'ft',
-        toImperial: v => v * 3.28084,
-        toSI: v => v / 3.28084,
-        formula: '1 m = 3.28084 ft  →  ft = m × 3.28084',
-        formulaRev: 'm = ft ÷ 3.28084' },
-      { name: 'Centimetri → Pollici', icon: '✏️',
-        unitFrom: 'cm', unitTo: 'in',
-        toImperial: v => v / 2.54,
-        toSI: v => v * 2.54,
-        formula: '1 in = 2.54 cm  →  in = cm ÷ 2.54',
-        formulaRev: 'cm = in × 2.54' },
-      { name: 'Metri → Iarde', icon: '🏟️',
-        unitFrom: 'm', unitTo: 'yd',
-        toImperial: v => v * 1.09361,
-        toSI: v => v / 1.09361,
-        formula: '1 m = 1.09361 yd  →  yd = m × 1.09361',
-        formulaRev: 'm = yd ÷ 1.09361' },
-    ]
-  },
-  {
-    id: 'massa',
-    label: 'Massa',
-    icon: '⚖️',
-    conversions: [
-      { name: 'Chilogrammi → Libbre', icon: '🏋️',
-        unitFrom: 'kg', unitTo: 'lb',
-        toImperial: v => v * 2.20462,
-        toSI: v => v / 2.20462,
-        formula: '1 kg = 2.20462 lb  →  lb = kg × 2.20462',
-        formulaRev: 'kg = lb ÷ 2.20462' },
-      { name: 'Grammi → Once', icon: '🍃',
-        unitFrom: 'g', unitTo: 'oz',
-        toImperial: v => v / 28.3495,
-        toSI: v => v * 28.3495,
-        formula: '1 oz = 28.3495 g  →  oz = g ÷ 28.3495',
-        formulaRev: 'g = oz × 28.3495' },
-      { name: 'Tonnellate → Ton corte', icon: '🚢',
-        unitFrom: 't', unitTo: 'ton',
-        toImperial: v => v * 1.10231,
-        toSI: v => v / 1.10231,
-        formula: '1 t = 1.10231 short ton  →  ton = t × 1.10231',
-        formulaRev: 't = ton ÷ 1.10231' },
-    ]
-  },
-  {
-    id: 'forza',
-    label: 'Forza',
-    icon: '💪',
-    conversions: [
-      { name: 'Newton → Libbra-forza', icon: '🔩',
-        unitFrom: 'N', unitTo: 'lbf',
-        toImperial: v => v * 0.224809,
-        toSI: v => v / 0.224809,
-        formula: '1 N = 0.224809 lbf  →  lbf = N × 0.224809',
-        formulaRev: 'N = lbf ÷ 0.224809' },
-      { name: 'Kilonewton → Libbra-forza', icon: '⚙️',
-        unitFrom: 'kN', unitTo: 'lbf',
-        toImperial: v => v * 224.809,
-        toSI: v => v / 224.809,
-        formula: '1 kN = 224.809 lbf  →  lbf = kN × 224.809',
-        formulaRev: 'kN = lbf ÷ 224.809' },
-      { name: 'Newton → Oncia-forza', icon: '🔧',
-        unitFrom: 'N', unitTo: 'ozf',
-        toImperial: v => v * 3.59694,
-        toSI: v => v / 3.59694,
-        formula: '1 N = 3.59694 ozf  →  ozf = N × 3.59694',
-        formulaRev: 'N = ozf ÷ 3.59694' },
-    ]
-  },
-  {
-    id: 'pressione',
-    label: 'Pressione',
-    icon: '🌡️',
-    conversions: [
-      { name: 'Pascal → PSI', icon: '🔴',
-        unitFrom: 'Pa', unitTo: 'psi',
-        toImperial: v => v / 6894.757,
-        toSI: v => v * 6894.757,
-        formula: '1 psi = 6894.757 Pa  →  psi = Pa ÷ 6894.757',
-        formulaRev: 'Pa = psi × 6894.757' },
-      { name: 'Bar → PSI', icon: '🔵',
-        unitFrom: 'bar', unitTo: 'psi',
-        toImperial: v => v * 14.5038,
-        toSI: v => v / 14.5038,
-        formula: '1 bar = 14.5038 psi  →  psi = bar × 14.5038',
-        formulaRev: 'bar = psi ÷ 14.5038' },
-      { name: 'Atmosfere → Pollici Hg', icon: '💈',
-        unitFrom: 'atm', unitTo: 'inHg',
-        toImperial: v => v * 29.9213,
-        toSI: v => v / 29.9213,
-        formula: '1 atm = 29.9213 inHg  →  inHg = atm × 29.9213',
-        formulaRev: 'atm = inHg ÷ 29.9213' },
-      { name: 'Kilopascal → PSI', icon: '🔮',
-        unitFrom: 'kPa', unitTo: 'psi',
-        toImperial: v => v * 0.145038,
-        toSI: v => v / 0.145038,
-        formula: '1 kPa = 0.145038 psi  →  psi = kPa × 0.145038',
-        formulaRev: 'kPa = psi ÷ 0.145038' },
-    ]
-  },
-  {
-    id: 'velocita',
-    label: 'Velocità',
-    icon: '🚀',
-    conversions: [
-      { name: 'km/h → mph', icon: '🚗',
-        unitFrom: 'km/h', unitTo: 'mph',
-        toImperial: v => v * 0.621371,
-        toSI: v => v / 0.621371,
-        formula: '1 km/h = 0.621371 mph  →  mph = km/h × 0.621371',
-        formulaRev: 'km/h = mph ÷ 0.621371' },
-      { name: 'm/s → mph', icon: '💨',
-        unitFrom: 'm/s', unitTo: 'mph',
-        toImperial: v => v * 2.23694,
-        toSI: v => v / 2.23694,
-        formula: '1 m/s = 2.23694 mph  →  mph = m/s × 2.23694',
-        formulaRev: 'm/s = mph ÷ 2.23694' },
-      { name: 'Nodi → mph', icon: '⛵',
-        unitFrom: 'kn', unitTo: 'mph',
-        toImperial: v => v * 1.15078,
-        toSI: v => v / 1.15078,
-        formula: '1 kn = 1.15078 mph  →  mph = kn × 1.15078',
-        formulaRev: 'kn = mph ÷ 1.15078' },
-      { name: 'm/s → ft/s', icon: '🏃',
-        unitFrom: 'm/s', unitTo: 'ft/s',
-        toImperial: v => v * 3.28084,
-        toSI: v => v / 3.28084,
-        formula: '1 m/s = 3.28084 ft/s  →  ft/s = m/s × 3.28084',
-        formulaRev: 'm/s = ft/s ÷ 3.28084' },
-    ]
-  },
-  {
-    id: 'temperatura',
-    label: 'Temperatura',
-    icon: '🌸',
-    conversions: [
-      { name: 'Celsius → Fahrenheit', icon: '🌡️',
-        unitFrom: '°C', unitTo: '°F',
-        toImperial: v => v * 9/5 + 32,
-        toSI: v => (v - 32) * 5/9,
-        formula: '°F = (°C × 9/5) + 32',
-        formulaRev: '°C = (°F − 32) × 5/9' },
-      { name: 'Kelvin → Fahrenheit', icon: '❄️',
-        unitFrom: 'K', unitTo: '°F',
-        toImperial: v => (v - 273.15) * 9/5 + 32,
-        toSI: v => (v - 32) * 5/9 + 273.15,
-        formula: '°F = (K − 273.15) × 9/5 + 32',
-        formulaRev: 'K = (°F − 32) × 5/9 + 273.15' },
-      { name: 'Kelvin → Rankine', icon: '🔥',
-        unitFrom: 'K', unitTo: '°R',
-        toImperial: v => v * 1.8,
-        toSI: v => v / 1.8,
-        formula: '°R = K × 1.8',
-        formulaRev: 'K = °R ÷ 1.8' },
-    ]
-  },
-  {
-    id: 'potenza',
-    label: 'Potenza',
-    icon: '⚡',
-    conversions: [
-      { name: 'Watt → Cavalli vapore', icon: '🐎',
-        unitFrom: 'W', unitTo: 'hp',
-        toImperial: v => v / 745.7,
-        toSI: v => v * 745.7,
-        formula: '1 hp = 745.7 W  →  hp = W ÷ 745.7',
-        formulaRev: 'W = hp × 745.7' },
-      { name: 'Kilowatt → Cavalli vapore', icon: '🏎️',
-        unitFrom: 'kW', unitTo: 'hp',
-        toImperial: v => v * 1.34102,
-        toSI: v => v / 1.34102,
-        formula: '1 kW = 1.34102 hp  →  hp = kW × 1.34102',
-        formulaRev: 'kW = hp ÷ 1.34102' },
-      { name: 'Watt → BTU/ora', icon: '🔆',
-        unitFrom: 'W', unitTo: 'BTU/h',
-        toImperial: v => v * 3.41214,
-        toSI: v => v / 3.41214,
-        formula: '1 W = 3.41214 BTU/h  →  BTU/h = W × 3.41214',
-        formulaRev: 'W = BTU/h ÷ 3.41214' },
-      { name: 'kW → BTU/ora', icon: '💡',
-        unitFrom: 'kW', unitTo: 'BTU/h',
-        toImperial: v => v * 3412.14,
-        toSI: v => v / 3412.14,
-        formula: '1 kW = 3412.14 BTU/h  →  BTU/h = kW × 3412.14',
-        formulaRev: 'kW = BTU/h ÷ 3412.14' },
-    ]
-  },
-  {
-    id: 'area',
-    label: 'Area',
-    icon: '🟪',
-    conversions: [
-      { name: 'm² → ft²', icon: '🏠',
-        unitFrom: 'm²', unitTo: 'ft²',
-        toImperial: v => v * 10.7639,
-        toSI: v => v / 10.7639,
-        formula: '1 m² = 10.7639 ft²  →  ft² = m² × 10.7639',
-        formulaRev: 'm² = ft² ÷ 10.7639' },
-      { name: 'km² → Miglia²', icon: '🗾',
-        unitFrom: 'km²', unitTo: 'mi²',
-        toImperial: v => v * 0.386102,
-        toSI: v => v / 0.386102,
-        formula: '1 km² = 0.386102 mi²  →  mi² = km² × 0.386102',
-        formulaRev: 'km² = mi² ÷ 0.386102' },
-      { name: 'Ettari → Acri', icon: '🌾',
-        unitFrom: 'ha', unitTo: 'ac',
-        toImperial: v => v * 2.47105,
-        toSI: v => v / 2.47105,
-        formula: '1 ha = 2.47105 ac  →  ac = ha × 2.47105',
-        formulaRev: 'ha = ac ÷ 2.47105' },
-      { name: 'cm² → in²', icon: '📦',
-        unitFrom: 'cm²', unitTo: 'in²',
-        toImperial: v => v / 6.4516,
-        toSI: v => v * 6.4516,
-        formula: '1 in² = 6.4516 cm²  →  in² = cm² ÷ 6.4516',
-        formulaRev: 'cm² = in² × 6.4516' },
-    ]
-  },
+// ── Live clock ──────────────────────────────────────────────
+(function tickClock() {
+  const el = document.getElementById('clock');
+  function tick() {
+    const d = new Date();
+    const p = n => String(n).padStart(2,'0');
+    el.textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+
+// ── Data ────────────────────────────────────────────────────
+const cats = [
+  { id:'lunghezza', label:'Lunghezza', icon:'📏', convs:[
+    { name:'Chilometri → Miglia',    uF:'km',   uT:'mi',     fwd:v=>v*0.621371,  rev:v=>v/0.621371,  fml:'mi = km × 0.621371',        fmlR:'km = mi ÷ 0.621371' },
+    { name:'Metri → Piedi',          uF:'m',    uT:'ft',     fwd:v=>v*3.28084,   rev:v=>v/3.28084,   fml:'ft = m × 3.28084',          fmlR:'m = ft ÷ 3.28084' },
+    { name:'Centimetri → Pollici',   uF:'cm',   uT:'in',     fwd:v=>v/2.54,      rev:v=>v*2.54,      fml:'in = cm ÷ 2.54   [1 in = 2.54 cm]', fmlR:'cm = in × 2.54' },
+    { name:'Metri → Iarde',          uF:'m',    uT:'yd',     fwd:v=>v*1.09361,   rev:v=>v/1.09361,   fml:'yd = m × 1.09361',          fmlR:'m = yd ÷ 1.09361' },
+  ]},
+  { id:'massa', label:'Massa', icon:'⚖️', convs:[
+    { name:'Chilogrammi → Libbre',   uF:'kg',   uT:'lb',     fwd:v=>v*2.20462,   rev:v=>v/2.20462,   fml:'lb = kg × 2.20462',         fmlR:'kg = lb ÷ 2.20462' },
+    { name:'Grammi → Once',          uF:'g',    uT:'oz',     fwd:v=>v/28.3495,   rev:v=>v*28.3495,   fml:'oz = g ÷ 28.3495   [1 oz = 28.3495 g]', fmlR:'g = oz × 28.3495' },
+    { name:'Tonnellate → Short Ton', uF:'t',    uT:'ton',    fwd:v=>v*1.10231,   rev:v=>v/1.10231,   fml:'ton = t × 1.10231',         fmlR:'t = ton ÷ 1.10231' },
+  ]},
+  { id:'forza', label:'Forza', icon:'⚙️', convs:[
+    { name:'Newton → Libbra-forza',      uF:'N',  uT:'lbf', fwd:v=>v*0.224809, rev:v=>v/0.224809, fml:'lbf = N × 0.224809',   fmlR:'N = lbf ÷ 0.224809' },
+    { name:'Kilonewton → Libbra-forza',  uF:'kN', uT:'lbf', fwd:v=>v*224.809,  rev:v=>v/224.809,  fml:'lbf = kN × 224.809',   fmlR:'kN = lbf ÷ 224.809' },
+    { name:'Newton → Oncia-forza',       uF:'N',  uT:'ozf', fwd:v=>v*3.59694,  rev:v=>v/3.59694,  fml:'ozf = N × 3.59694',    fmlR:'N = ozf ÷ 3.59694' },
+  ]},
+  { id:'pressione', label:'Pressione', icon:'◉', convs:[
+    { name:'Pascal → PSI',         uF:'Pa',  uT:'psi',  fwd:v=>v/6894.757,  rev:v=>v*6894.757,  fml:'psi = Pa ÷ 6894.757   [1 psi = 6894.757 Pa]', fmlR:'Pa = psi × 6894.757' },
+    { name:'Bar → PSI',            uF:'bar', uT:'psi',  fwd:v=>v*14.5038,   rev:v=>v/14.5038,   fml:'psi = bar × 14.5038',  fmlR:'bar = psi ÷ 14.5038' },
+    { name:'Atmosfere → Pol. Hg',  uF:'atm', uT:'inHg', fwd:v=>v*29.9213,   rev:v=>v/29.9213,   fml:'inHg = atm × 29.9213', fmlR:'atm = inHg ÷ 29.9213' },
+    { name:'Kilopascal → PSI',     uF:'kPa', uT:'psi',  fwd:v=>v*0.145038,  rev:v=>v/0.145038,  fml:'psi = kPa × 0.145038', fmlR:'kPa = psi ÷ 0.145038' },
+  ]},
+  { id:'velocita', label:'Velocità', icon:'◈', convs:[
+    { name:'km/h → mph',   uF:'km/h', uT:'mph',  fwd:v=>v*0.621371, rev:v=>v/0.621371, fml:'mph = km/h × 0.621371', fmlR:'km/h = mph ÷ 0.621371' },
+    { name:'m/s → mph',    uF:'m/s',  uT:'mph',  fwd:v=>v*2.23694,  rev:v=>v/2.23694,  fml:'mph = m/s × 2.23694',   fmlR:'m/s = mph ÷ 2.23694' },
+    { name:'Nodi → mph',   uF:'kn',   uT:'mph',  fwd:v=>v*1.15078,  rev:v=>v/1.15078,  fml:'mph = kn × 1.15078',    fmlR:'kn = mph ÷ 1.15078' },
+    { name:'m/s → ft/s',   uF:'m/s',  uT:'ft/s', fwd:v=>v*3.28084,  rev:v=>v/3.28084,  fml:'ft/s = m/s × 3.28084',  fmlR:'m/s = ft/s ÷ 3.28084' },
+  ]},
+  { id:'temperatura', label:'Temperatura', icon:'◇', convs:[
+    { name:'Celsius → Fahrenheit', uF:'°C', uT:'°F', fwd:v=>v*9/5+32,             rev:v=>(v-32)*5/9,           fml:'°F = (°C × 9/5) + 32',            fmlR:'°C = (°F − 32) × 5/9' },
+    { name:'Kelvin → Fahrenheit',  uF:'K',  uT:'°F', fwd:v=>(v-273.15)*9/5+32,    rev:v=>(v-32)*5/9+273.15,    fml:'°F = (K − 273.15) × 9/5 + 32',    fmlR:'K = (°F − 32) × 5/9 + 273.15' },
+    { name:'Kelvin → Rankine',     uF:'K',  uT:'°R', fwd:v=>v*1.8,                rev:v=>v/1.8,                fml:'°R = K × 1.8',                    fmlR:'K = °R ÷ 1.8' },
+  ]},
+  { id:'potenza', label:'Potenza', icon:'⚡', convs:[
+    { name:'Watt → Cavalli vapore', uF:'W',  uT:'hp',    fwd:v=>v/745.7,    rev:v=>v*745.7,    fml:'hp = W ÷ 745.7   [1 hp = 745.7 W]', fmlR:'W = hp × 745.7' },
+    { name:'kW → Cavalli vapore',   uF:'kW', uT:'hp',    fwd:v=>v*1.34102,  rev:v=>v/1.34102,  fml:'hp = kW × 1.34102',  fmlR:'kW = hp ÷ 1.34102' },
+    { name:'Watt → BTU/h',          uF:'W',  uT:'BTU/h', fwd:v=>v*3.41214,  rev:v=>v/3.41214,  fml:'BTU/h = W × 3.41214', fmlR:'W = BTU/h ÷ 3.41214' },
+    { name:'kW → BTU/h',            uF:'kW', uT:'BTU/h', fwd:v=>v*3412.14,  rev:v=>v/3412.14,  fml:'BTU/h = kW × 3412.14', fmlR:'kW = BTU/h ÷ 3412.14' },
+  ]},
+  { id:'area', label:'Area', icon:'▣', convs:[
+    { name:'m² → ft²',        uF:'m²',  uT:'ft²', fwd:v=>v*10.7639,  rev:v=>v/10.7639,  fml:'ft² = m² × 10.7639',  fmlR:'m² = ft² ÷ 10.7639' },
+    { name:'km² → mi²',       uF:'km²', uT:'mi²', fwd:v=>v*0.386102, rev:v=>v/0.386102, fml:'mi² = km² × 0.386102', fmlR:'km² = mi² ÷ 0.386102' },
+    { name:'Ettari → Acri',   uF:'ha',  uT:'ac',  fwd:v=>v*2.47105,  rev:v=>v/2.47105,  fml:'ac = ha × 2.47105',   fmlR:'ha = ac ÷ 2.47105' },
+    { name:'cm² → in²',       uF:'cm²', uT:'in²', fwd:v=>v/6.4516,   rev:v=>v*6.4516,   fml:'in² = cm² ÷ 6.4516   [1 in² = 6.4516 cm²]', fmlR:'cm² = in² × 6.4516' },
+  ]},
 ];
 
-// ─────────────────────────────────────────────
-// STATE: track direction per conversion
-// ─────────────────────────────────────────────
-const directions = {}; // key: `${catId}-${convIdx}` → 'forward' | 'reverse'
+// ── State ───────────────────────────────────────────────────
+const dir = {};
 
-// ─────────────────────────────────────────────
-// BUILD UI
-// ─────────────────────────────────────────────
+// ── Build UI ────────────────────────────────────────────────
 const tabBar = document.getElementById('tabBar');
-const mainContent = document.getElementById('mainContent');
+const main   = document.getElementById('mainContent');
 
-categories.forEach((cat, ci) => {
-  // Tab button
+cats.forEach((cat, ci) => {
+  // tab
   const btn = document.createElement('button');
-  btn.className = 'tab-btn' + (ci === 0 ? ' active' : '');
-  btn.textContent = cat.icon + ' ' + cat.label;
+  btn.className = 'tab-btn' + (ci===0?' active':'');
+  btn.innerHTML = `<span class="tab-icon">${cat.icon}</span>${cat.label}`;
   btn.addEventListener('click', () => switchTab(cat.id));
   tabBar.appendChild(btn);
 
-  // Panel
+  // panel
   const panel = document.createElement('div');
   panel.id = 'panel-' + cat.id;
-  panel.className = 'category-panel' + (ci === 0 ? ' active' : '');
+  panel.className = 'category-panel' + (ci===0?' active':'');
 
-  const title = document.createElement('div');
-  title.className = 'panel-title';
-  title.textContent = cat.icon + '  ' + cat.label;
-  panel.appendChild(title);
+  panel.innerHTML = `
+    <div class="ph">
+      <div class="ph-icon">${cat.icon}</div>
+      <div class="ph-title">${cat.label}</div>
+      <div class="ph-count">[ ${cat.convs.length} CONV ]</div>
+    </div>
+  `;
 
-  cat.conversions.forEach((conv, vi) => {
-    const key = `${cat.id}-${vi}`;
-    directions[key] = 'forward';
+  cat.convs.forEach((c, vi) => {
+    const k = `${cat.id}-${vi}`;
+    dir[k] = 'fwd';
 
     const card = document.createElement('div');
     card.className = 'card';
-
     card.innerHTML = `
-      <div class="card-header">
-        <div class="card-icon">${conv.icon}</div>
-        <div class="card-name">${conv.name}</div>
-        <div class="card-direction" id="dir-${key}">SI → Imperiale</div>
+      <div class="card-hdr">
+        <div class="c-icon">▸</div>
+        <div class="c-name">${c.name}</div>
+        <div class="c-dir" id="d-${k}">SI → IMP</div>
       </div>
-      <div class="input-row">
-        <div class="field-group">
-          <div class="field-label" id="lbl-from-${key}">${conv.unitFrom}</div>
-          <input class="field-input" type="number" id="inp-from-${key}" placeholder="0" step="any" />
-          <div class="field-unit" id="unit-from-${key}">${conv.unitFrom}</div>
+      <div class="inp-row">
+        <div class="fld">
+          <div class="fld-lbl" id="lf-${k}">${c.uF}</div>
+          <input class="fld-inp" type="number" id="if-${k}" placeholder="0.000" step="any">
+          <div class="fld-unit" id="uf-${k}">${c.uF}</div>
         </div>
-        <button class="arrow-btn" id="arrow-${key}" title="Inverti direzione">⇄</button>
-        <div class="field-group">
-          <div class="field-label" id="lbl-to-${key}">${conv.unitTo}</div>
-          <input class="field-input result" type="number" id="inp-to-${key}" placeholder="—" readonly />
-          <div class="field-unit" id="unit-to-${key}">${conv.unitTo}</div>
+        <button class="swap-btn" id="sb-${k}" title="Inverti">⇄</button>
+        <div class="fld">
+          <div class="fld-lbl" id="lt-${k}">${c.uT}</div>
+          <input class="fld-inp result" type="number" id="it-${k}" placeholder="—" readonly>
+          <div class="fld-unit" id="ut-${k}">${c.uT}</div>
         </div>
       </div>
-      <div class="formula-box">
-        <div class="formula-label">✦ formula</div>
-        <div class="formula-text" id="formula-${key}">${conv.formula}</div>
+      <div class="formula">
+        <div class="f-lbl">FORMULA</div>
+        <div class="f-txt" id="fm-${k}">${c.fml}</div>
       </div>
     `;
-
     panel.appendChild(card);
 
-    // Events (after appending so elements exist)
     setTimeout(() => {
-      const inpFrom  = document.getElementById(`inp-from-${key}`);
-      const inpTo    = document.getElementById(`inp-to-${key}`);
-      const arrowBtn = document.getElementById(`arrow-${key}`);
+      const iF = document.getElementById(`if-${k}`);
+      const iT = document.getElementById(`it-${k}`);
+      const sb = document.getElementById(`sb-${k}`);
 
-      inpFrom.addEventListener('input', () => {
-        const val = parseFloat(inpFrom.value);
-        if (isNaN(val)) { inpTo.value = ''; return; }
-        const result = directions[key] === 'forward'
-          ? conv.toImperial(val)
-          : conv.toSI(val);
-        inpTo.value = +result.toFixed(6);
+      iF.addEventListener('input', () => {
+        const v = parseFloat(iF.value);
+        if (isNaN(v)) { iT.value=''; return; }
+        iT.value = +(dir[k]==='fwd' ? c.fwd(v) : c.rev(v)).toFixed(6);
       });
 
-      arrowBtn.addEventListener('click', () => {
-        directions[key] = directions[key] === 'forward' ? 'reverse' : 'forward';
-        const fwd = directions[key] === 'forward';
-
-        document.getElementById(`lbl-from-${key}`).textContent  = fwd ? conv.unitFrom : conv.unitTo;
-        document.getElementById(`unit-from-${key}`).textContent = fwd ? conv.unitFrom : conv.unitTo;
-        document.getElementById(`lbl-to-${key}`).textContent    = fwd ? conv.unitTo   : conv.unitFrom;
-        document.getElementById(`unit-to-${key}`).textContent   = fwd ? conv.unitTo   : conv.unitFrom;
-        document.getElementById(`dir-${key}`).textContent       = fwd ? 'SI → Imperiale' : 'Imperiale → SI';
-        document.getElementById(`formula-${key}`).textContent   = fwd ? conv.formula : conv.formulaRev;
-
-        // Flip values
-        const old = parseFloat(inpTo.value);
-        inpFrom.value = isNaN(old) ? '' : old;
-        if (!isNaN(old)) {
-          const res = fwd ? conv.toImperial(old) : conv.toSI(old);
-          inpTo.value = +res.toFixed(6);
-        } else {
-          inpTo.value = '';
-        }
-
-        // Animate arrow
-        arrowBtn.style.transform = 'scale(1.25) rotate(180deg)';
-        setTimeout(() => { arrowBtn.style.transform = ''; }, 200);
+      sb.addEventListener('click', () => {
+        dir[k] = dir[k]==='fwd' ? 'rev' : 'fwd';
+        const f = dir[k]==='fwd';
+        document.getElementById(`lf-${k}`).textContent = f ? c.uF : c.uT;
+        document.getElementById(`uf-${k}`).textContent = f ? c.uF : c.uT;
+        document.getElementById(`lt-${k}`).textContent = f ? c.uT : c.uF;
+        document.getElementById(`ut-${k}`).textContent = f ? c.uT : c.uF;
+        document.getElementById(`d-${k}`).textContent  = f ? 'SI → IMP' : 'IMP → SI';
+        document.getElementById(`fm-${k}`).textContent = f ? c.fml : c.fmlR;
+        const old = parseFloat(iT.value);
+        iF.value = isNaN(old) ? '' : old;
+        iT.value = isNaN(old) ? '' : +(f ? c.fwd(old) : c.rev(old)).toFixed(6);
+        sb.style.transform = 'rotate(180deg)';
+        setTimeout(()=>{ sb.style.transform=''; }, 220);
       });
     }, 0);
   });
 
-  mainContent.appendChild(panel);
+  main.appendChild(panel);
 });
 
-// ─────────────────────────────────────────────
-// TAB SWITCHING
-// ─────────────────────────────────────────────
-function switchTab(catId) {
-  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-    btn.classList.toggle('active', categories[i].id === catId);
-  });
-  document.querySelectorAll('.category-panel').forEach(p => {
-    p.classList.toggle('active', p.id === 'panel-' + catId);
-  });
+// ── Tab switch ──────────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', cats[i].id===id));
+  document.querySelectorAll('.category-panel').forEach(p => p.classList.toggle('active', p.id==='panel-'+id));
 }
 </script>
 </body>
